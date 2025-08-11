@@ -23,12 +23,13 @@ class CameraGUI(Camera):
     def __init_gui(self):
         self.__update_ctls_menus()
         self.__update_devices()
-
+        self.__update_formats()
+    
     def __init_events(self):
         self.__ui.entry_fps.bind("<Return>", self.__on_chenge_fps)
         TimerEx().after(1000, self.__init_scale_events)
 
-    def __init_scale_events(self, elapsed: float):
+    def __init_scale_events(self):
         for scale in self.__setting_scales:
             scale.bind(self.__on_scale_changed)
 
@@ -41,6 +42,11 @@ class CameraGUI(Camera):
             if int(fps)>0:
                 self.__settings.framerate = int(fps)
                 self.__ui.frame_main.focus_set()
+
+    def __on_change_image_size(self, size: str):
+        self.close()
+        self.__settings.resolution = tuple(map(int, size.split('x')))
+        TimerEx().after(100,self.__reconnect_cam)
 
     def __on_change_device(self, device: str):
         num = int(device.replace('/dev/video', ''))
@@ -79,9 +85,19 @@ class CameraGUI(Camera):
     # *******************************
     # private function
     # *******************************
-    def __reconnect_cam(self,elapsed: float):
+    def __reconnect_cam(self):
         callback = self.get_callback()
         super().__init__(self.__settings,callback)
+
+    def __update_formats(self):
+        formats = self.__settings.mjpeg_formats
+        self.__ui.opt_image_size["menu"].delete(0, "end")
+        for format in formats:
+            self.__ui.opt_image_size["menu"].add_command(
+                label=format,
+                command=tk._setit(self.__ui.val_image_size, format, self.__on_change_image_size)
+            )
+        self.__ui.val_image_size.set(f'{self.__settings.resolution[0]}x{self.__settings.resolution[1]}')
 
     def __update_devices(self):
         devices = self.__settings.camera_devices

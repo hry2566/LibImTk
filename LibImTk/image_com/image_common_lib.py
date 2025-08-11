@@ -12,7 +12,7 @@ class ImageCommLib():
             img_list.append(im)
         return img_list
 
-    def get_blank_image(img_size, channel=3):
+    def get_blank_image(img_size=(640,480), channel=3):
         height, width = img_size[1], img_size[0]
         if channel == 1:
             return np.zeros((height, width), dtype=np.uint8)

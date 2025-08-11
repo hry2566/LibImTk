@@ -2,13 +2,21 @@ import threading
 import time
 
 class TimerEx:
+    # **********************************************************
+    # init function
+    # **********************************************************
     def __init__(self, interval_ms:int=None, callback:callable=None):
         self.__interval = interval_ms / 1000 if interval_ms is not None else None
         self.__callback = callback
         self.__is_running = False
         self.__timer_thread = None
         self.__start_time = None
+        self.__elapsed:int = 0
 
+
+    # **********************************************************
+    # thrad function
+    # **********************************************************
     def __timer_loop(self):
         self.__start_time = time.perf_counter()
         next_call_time = self.__start_time
@@ -23,10 +31,21 @@ class TimerEx:
             try:
                 elapsed = time.perf_counter() - self.__start_time
                 if self.__callback:
-                    self.__callback(elapsed * 1000)
+                    self.__elapsed = elapsed * 1000
+                    self.__callback()
             except Exception as e:
                 print(f"Error in timer callback: {e}")
+    
+    # **********************************************************
+    # property function
+    # **********************************************************
+    @property
+    def elapsed(self):
+        return self.__elapsed
 
+    # **********************************************************
+    # public function
+    # **********************************************************
     def start(self):
         if not self.__is_running:
             self.__is_running = True
@@ -57,7 +76,8 @@ class TimerEx:
             time.sleep(delay_sec)
             try:
                 elapsed = time.perf_counter() - start_time
-                callback(elapsed * 1000, *args)
+                self.__elapsed = elapsed * 1000
+                callback(*args)
             except Exception as e:
                 print(f"Error in after() callback: {e}")
         threading.Thread(target=run_after, daemon=True).start()

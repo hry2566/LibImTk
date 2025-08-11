@@ -6,12 +6,13 @@ from LibImTk.common.timer_ex import TimerEx
 class CameraSettings:
     V4W2_PATH = f'./LibImTk/common/Camera/lib/v4w2-ctl.exe'
 
-    def __init__(self,path_settings: str=None):
+    def __init__(self, path_settings: str = None):
         self.device_number: int = 0
         self.resolution: tuple = (640, 480)
         self.framerate: int = 10
         self.__camera_devices: dict = None
         self.__v4w2_ctrls_menus: dict = None
+        self.__mjpeg_formats: dict = None
 
         if path_settings is not None:
             self.load_file(path_settings)
@@ -20,7 +21,7 @@ class CameraSettings:
             self.device_number = 0
 
     @property
-    def v4w2_ctls_menus(self)->dict:
+    def v4w2_ctls_menus(self) -> dict:
         self.__v4w2_ctrls_menus = self.__get_v4w2_ctrs_menus()
         return self.__v4w2_ctrls_menus
 
@@ -29,13 +30,18 @@ class CameraSettings:
         self.__v4w2_ctrls_menus = value
 
     @property
-    def camera_devices(self)->dict:
+    def camera_devices(self) -> dict:
         self.__camera_devices = self.__get_camera_devices()
         return self.__camera_devices
 
+    @property
+    def mjpeg_formats(self) -> dict:
+        self.__mjpeg_formats = self.__get_v4w2_formats_ext()
+        return self.__mjpeg_formats
+
     def __get_v4w2_ctrs_menus(self, args: list = ['-L']) -> dict:
-        # print( [self.V4W2_PATH, '-d', f'/dev/video{self.device_number}'] + args)
         try:
+            # print([self.V4W2_PATH, '-d', f'/dev/video{self.device_number}'] + args)
             result = subprocess.run(
                 [self.V4W2_PATH, '-d', f'/dev/video{self.device_number}'] + args,
                 capture_output=True,
@@ -89,6 +95,60 @@ class CameraSettings:
             print(f"An unexpected error occurred: {e}")
             return None
 
+    def __get_v4w2_formats_ext(self) -> dict:
+        """
+        v4l2-ctl --list-formats-ext の出力から、MJPEGフォーマットの解像度とフレームレートを取得します。
+        出力例: {'1920x1080': '30.000 fps', '1280x1024': '30.000 fps', ...}
+        """
+        try:
+            # print([self.V4W2_PATH, '-d', f'/dev/video{self.device_number}', '--list-formats-ext'])
+            result = subprocess.run(
+                [self.V4W2_PATH, '-d', f'/dev/video{self.device_number}', '--list-formats-ext'],
+                capture_output=True,
+                text=True,
+                check=True,
+                encoding='utf-8'
+            )
+
+            output_lines = result.stdout.splitlines()
+            mjpeg_formats = {}
+            in_mjpeg_section = False
+
+            for line in output_lines:
+                # MJPG セクションの開始検出
+                if "[0]: 'MJPG'" in line:
+                    in_mjpeg_section = True
+                    continue
+
+                # 次のフォーマットセクションに入ったら終了
+                if in_mjpeg_section and line.strip().startswith("[") and "'MJPG'" not in line:
+                    break
+
+                if in_mjpeg_section:
+                    size_match = re.search(r'Size:\s+Discrete\s+(\d+x\d+)', line)
+                    if size_match:
+                        current_size = size_match.group(1)
+                        continue  # 次の行に Interval があるので待つ
+
+                    interval_match = re.search(r'Interval:\s+Discrete\s+[\d.]+s\s+\(([\d.]+)\s+fps\)', line)
+                    if interval_match and current_size:
+                        fps = interval_match.group(1)
+                        mjpeg_formats[current_size] = f"{fps} fps"
+
+            return mjpeg_formats
+
+        except FileNotFoundError:
+            print(f"Error: The executable file was not found at {self.V4W2_PATH}")
+            return {}
+        except subprocess.CalledProcessError as e:
+            print(f"Error: Command failed with return code {e.returncode}")
+            print(f"Stderr: {e.stderr}")
+            return {}
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return {}
+
+
     def __convert_value(self, value_str: str, value_type: str):
         if value_str is None:
             return None
@@ -136,27 +196,27 @@ class CameraSettings:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             return None
-        
+    
     def __set_v4w2_ctl(self, params: dict):
         """
         v4w2-ctlを使用してカメラの設定を適用します。
         
         Args:
             params (dict): {パラメータ名: 値} の形式の辞書。
-                           例: {'whitebalance_automatic': 1, 'brightness': 128}
+                            例: {'whitebalance_automatic': 1, 'brightness': 128}
         """
         try:
             args = ['-d', f'/dev/video{self.device_number}']
             for key, value in params.items():
                 args.extend(['-c', f'{key}={value}'])
-                
+            
             result = subprocess.run(
                 [self.V4W2_PATH] + args,
                 capture_output=True,
                 text=True,
                 check=True,
                 encoding='utf-8'
-            )        
+            )       
         except FileNotFoundError:
             print(f"Error: The executable file was not found at {self.V4W2_PATH}")
         except subprocess.CalledProcessError as e:
@@ -190,7 +250,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 whitebalance = scale_finder('whitebalance').get()
                 cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance)
-                TimerEx().after(100, lambda _t: cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance))
+                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance))
         elif item_name == 'whitebalance':
             cam.set(cv2.CAP_PROP_TEMPERATURE, value)
             if scale_finder:
@@ -204,7 +264,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 exposure = scale_finder('exposure').get()
                 cam.set(cv2.CAP_PROP_EXPOSURE, exposure)
-                TimerEx().after(100, lambda _t: cam.set(cv2.CAP_PROP_EXPOSURE, exposure))
+                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_EXPOSURE, exposure))
         elif item_name == 'exposure':
             cam.set(cv2.CAP_PROP_EXPOSURE, value)
             if scale_finder:
@@ -214,7 +274,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 focus = scale_finder('focus').get()
                 cam.set(cv2.CAP_PROP_FOCUS, focus)
-                TimerEx().after(100, lambda _t: cam.set(cv2.CAP_PROP_FOCUS, focus))
+                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_FOCUS, focus))
         elif item_name == 'focus':
             cam.set(cv2.CAP_PROP_FOCUS, value)
             if scale_finder:
@@ -229,12 +289,4 @@ class CameraSettings:
     def apply_resolution(self, cam: cv2.VideoCapture):
         cam.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
         cam.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
-
-    
-    
-
-
-        
-
-
-    
+        print('apply_resolution')

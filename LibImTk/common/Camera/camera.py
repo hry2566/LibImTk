@@ -4,6 +4,7 @@ from typing import Literal
 import cv2
 
 from LibImTk import CameraSettings
+from LibImTk.image_com.image_common_lib import ImageCommLib
 
 class Camera:
     # **********************************************************
@@ -84,6 +85,8 @@ class Camera:
             if img is not None and self.__read_frame_function is not None:
                 self.__handler(self.__read_frame_function, img)
             else:
+                img=ImageCommLib.get_blank_image()
+                self.__handler(self.__read_frame_function, img)
                 if self.__stop_get_frame_event.wait(0.005):
                     break
 
@@ -171,15 +174,28 @@ class Camera:
         while not self.__is_cam_opened:
             time.sleep(0.1)
 
-    def start_get_frame(self):
+    # def start_get_buffer(self):
+    #     self.__stop_read_buffer_event.clear()
+    #     self.__thread_read_buffer = self.__start_thread(self.__start_read_buffer)
+    #     print('start_get_buffer')
+
+    # def stop_get_buffer(self):
+    #     self.__stop_read_buffer_event.set()
+    #     if self.__thread_read_buffer is not None:
+    #         self.__thread_read_buffer.join()
+    #     print('stop_get_buffer')
+
+    def start_get_frame(self,elapsed=None):
         self.__stop_get_frame_event.clear()
         self.__thread_get_frame = self.__start_thread(self.__start_get_frame)
+        print('start_get_frame')
 
-    def stop_get_frame(self):
-        self.__stop_get_frame_event.set()
-        if self.__thread_get_frame is not None:
-            self.__thread_get_frame.join()
-        self.__thread_get_frame = None
+    # def stop_get_frame(self):
+    #     self.__stop_get_frame_event.set()
+    #     if self.__thread_get_frame is not None:
+    #         self.__thread_get_frame.join()
+    #     self.__thread_get_frame = None
+    #     print('stop_get_frame')
 
     def get_callback(self):
         return [self.__open_cam_callback,self.__read_frame_function]

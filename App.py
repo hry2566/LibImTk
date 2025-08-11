@@ -6,10 +6,11 @@ from LibImTk import ImshowCustom, CameraGUI, CameraSettings
 
 
 class App(baseui.AppUI):
-    # ***************************************
-    # init function
-    # ***************************************
     def __init__(self, master=None):
+
+        # ***************************************
+        # init function
+        # ***************************************
         super().__init__(master)
         self.__draw_flag:bool=True
         self.__cv2c:ImshowCustom = None
