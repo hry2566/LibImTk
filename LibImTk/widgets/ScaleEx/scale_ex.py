@@ -1,8 +1,10 @@
 import tkinter as tk
 
+from LibImTk.common.timer_ex import TimerEx
+
 class ScaleEx():
     def __init__(self, master):
-        self.__val = tk.StringVar()
+        self.__val = tk.IntVar()
         self.__max :int = 100
         self.__min :int = 0
         self.__default:int =0
@@ -101,6 +103,7 @@ class ScaleEx():
             self.__min = from_
         if not default == None:
             self.__default = default
+            
 
     def get(self)->int:
         if self.__scale['resolution'] == 1.0:

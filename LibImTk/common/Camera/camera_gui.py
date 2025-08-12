@@ -27,7 +27,8 @@ class CameraGUI(Camera):
     
     def __init_events(self):
         self.__ui.entry_fps.bind("<Return>", self.__on_chenge_fps)
-        TimerEx().after(1000, self.__init_scale_events)
+        TimerEx.after(1000, self.__init_scale_events)
+        self.__ui.btn_reload_settings.bind('<1>',self.__on_click_reload_setting)
 
     def __init_scale_events(self):
         for scale in self.__setting_scales:
@@ -36,6 +37,10 @@ class CameraGUI(Camera):
     # *******************************
     # events function
     # *******************************
+    def __on_click_reload_setting(self, event):
+        self.__init_gui()
+        self.__init_events()
+
     def __on_chenge_fps(self, event):
         fps = self.__ui.entry_fps.get()
         if fps.isdigit():
@@ -46,7 +51,7 @@ class CameraGUI(Camera):
     def __on_change_image_size(self, size: str):
         self.close()
         self.__settings.resolution = tuple(map(int, size.split('x')))
-        TimerEx().after(100,self.__reconnect_cam)
+        TimerEx.after(100,self.__reconnect_cam)
 
     def __on_change_device(self, device: str):
         num = int(device.replace('/dev/video', ''))
@@ -56,7 +61,7 @@ class CameraGUI(Camera):
         self.__settings.device_number = num
         self.__init_gui()
         self.__init_events()
-        TimerEx().after(100, self.__reconnect_cam)
+        TimerEx.after(100, self.__reconnect_cam)
 
     def __on_scale_changed(self):
         settings_bk = self.__settings.v4w2_ctls_menus
@@ -72,8 +77,9 @@ class CameraGUI(Camera):
                     new_val,
                     scale_finder=self.__find_scale_by_name
                 )
-            settings_new[key]['value'] = new_val
-
+                settings_new[key]['value'] = new_val
+                break
+        
         self.__settings.v4w2_ctls_menus = settings_new
 
     def __find_scale_by_name(self, name: str)->ScaleEx:

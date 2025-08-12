@@ -11,7 +11,7 @@ def test2(event):
 if __name__ == "__main__":
     app = ImshowCustom()
     settings = CameraSettings()
-    settings.device_number = 1
+    settings.device_number = 0
     # settings.resolution = (3840, 2160)
     settings.resolution = (1920, 1080)
     settings.framerate = 10
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     elapsed_time = 0
     while True:
         img = cam.read() 
-        app.imshow(cam.fps, img)
+        app.imshow(f'FPS:{cam.fps}', img)
         key = app.waitKey(1)
         if key == 113:
             break

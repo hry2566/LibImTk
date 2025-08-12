@@ -60,9 +60,10 @@ class TimerEx:
                 self.__timer_thread.join()
                 print("BusyLoopTimer stopped.")
 
-    def after(self, delay_ms: float, callback: callable, *args: tuple):
+    @staticmethod
+    def after(delay_ms: float, callback: callable, *args: tuple):
         """
-        指定時間後にコールバックを1回だけ呼び出す（elapsed付き）。
+        指定時間後にコールバックを1回だけ呼び出す
         
         Args:
             delay_ms (float): 遅延時間（ミリ秒）。
@@ -70,30 +71,26 @@ class TimerEx:
             *args: コールバック関数に渡す引数。
         """
         delay_sec = delay_ms / 1000
-        start_time = time.perf_counter()
 
         def run_after():
             time.sleep(delay_sec)
             try:
-                elapsed = time.perf_counter() - start_time
-                self.__elapsed = elapsed * 1000
                 callback(*args)
             except Exception as e:
                 print(f"Error in after() callback: {e}")
         threading.Thread(target=run_after, daemon=True).start()
 
 if __name__ == '__main__':
-    def repeated(elapsed_ms):
-        print(f"[Repeated] {elapsed_ms:.2f}ms")
+    def repeated():
+        print(f"[Repeated] {timer.elapsed:.2f}ms")
 
-    def one_shot(elapsed_ms, *args):
-        print(f"[After] One-time callback fired after {elapsed_ms:.2f}ms")
+    def one_shot(*args):
         print(f"Received arguments: {args}")
 
     timer = TimerEx(1000, repeated)
     timer.start()
 
-    timer.after(3000, one_shot, "arg1", 123)
+    TimerEx.after(3000, one_shot, "arg1", 123)
 
     time.sleep(6)
     timer.stop()

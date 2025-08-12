@@ -9,6 +9,12 @@ class CameraUI:
         tkscrolledframe2 = TkScrolledFrame(master, scrolltype="both")
         tkscrolledframe2.innerframe.configure(width=350)
         tkscrolledframe2.configure(usemousewheel=False)
+        self.btn_reload_settings = tk.Button(
+            tkscrolledframe2.innerframe,
+            name="btn_reload_settings")
+        self.btn_reload_settings.configure(text='reload settings')
+        self.btn_reload_settings.pack(
+            fill="x", ipadx=4, ipady=4, padx=8, pady=4, side="top")
         self.frame_main = tk.Frame(
             tkscrolledframe2.innerframe,
             name="frame_main")

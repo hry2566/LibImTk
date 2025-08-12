@@ -1,5 +1,6 @@
 import re
 import subprocess
+from time import sleep
 import cv2
 from LibImTk.common.timer_ex import TimerEx
 
@@ -82,7 +83,6 @@ class CameraSettings:
                         menu_id = int(menu_match.group(1))
                         menu_label = menu_match.group(2).strip()
                         params_dict[current_param_name]['menu'][menu_id] = menu_label
-
             return params_dict
         except FileNotFoundError:
             print(f"Error: The executable file was not found at {self.V4W2_PATH}")
@@ -250,7 +250,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 whitebalance = scale_finder('whitebalance').get()
                 cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance)
-                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance))
+                TimerEx.after(100, lambda : cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance))
         elif item_name == 'whitebalance':
             cam.set(cv2.CAP_PROP_TEMPERATURE, value)
             if scale_finder:
@@ -264,7 +264,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 exposure = scale_finder('exposure').get()
                 cam.set(cv2.CAP_PROP_EXPOSURE, exposure)
-                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_EXPOSURE, exposure))
+                TimerEx.after(100, lambda : cam.set(cv2.CAP_PROP_EXPOSURE, exposure))
         elif item_name == 'exposure':
             cam.set(cv2.CAP_PROP_EXPOSURE, value)
             if scale_finder:
@@ -274,7 +274,7 @@ class CameraSettings:
             if value == 0 and scale_finder:
                 focus = scale_finder('focus').get()
                 cam.set(cv2.CAP_PROP_FOCUS, focus)
-                TimerEx().after(100, lambda : cam.set(cv2.CAP_PROP_FOCUS, focus))
+                TimerEx.after(100, lambda : cam.set(cv2.CAP_PROP_FOCUS, focus))
         elif item_name == 'focus':
             cam.set(cv2.CAP_PROP_FOCUS, value)
             if scale_finder:
@@ -285,6 +285,14 @@ class CameraSettings:
             cam.set(cv2.CAP_PROP_TILT, value)
         elif item_name == 'zoom':
             cam.set(cv2.CAP_PROP_ZOOM, value)
+
+        if item_name == 'whitebalance_automatic':
+            self.__set_v4w2_ctl({'whitebalance_automatic': value})
+            if value == 0 and scale_finder:
+                whitebalance = scale_finder('whitebalance').get()
+                cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance)
+                TimerEx.after(100, lambda: cam.set(cv2.CAP_PROP_TEMPERATURE, whitebalance))
+            return
 
     def apply_resolution(self, cam: cv2.VideoCapture):
         cam.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])

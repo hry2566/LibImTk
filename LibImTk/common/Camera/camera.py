@@ -23,10 +23,10 @@ class Camera:
         self.__is_cam_opened: bool = False
         self.__settings: CameraSettings = settings
         self.__cam: cv2.VideoCapture = None
-        self.__start: float = time.time()
         self.__frame_count: int = 0
         self.__fps: int = 0
-        self.__fps_display_time: float = time.time()
+        self.__start: float = time.perf_counter()
+        self.__fps_display_time: float = time.perf_counter()
 
         if callback is not None:
             self.__open_cam_callback = callback[0]
@@ -87,7 +87,7 @@ class Camera:
             else:
                 img=ImageCommLib.get_blank_image()
                 self.__handler(self.__read_frame_function, img)
-                if self.__stop_get_frame_event.wait(0.005):
+                if self.__stop_get_frame_event.wait(0.001):
                     break
 
     # **********************************************************
@@ -106,8 +106,6 @@ class Camera:
         return th
     
     def __close(self):
-        self.__stop_open_cam_event.set()
-        # self.__read_frame_function=None
         self.__stop_read_buffer_event.set()
         if self.__thread_read_buffer is not None:
             self.__thread_read_buffer.join()
@@ -143,32 +141,61 @@ class Camera:
         except:
             pass
 
+    # def read(self) -> cv2.Mat:
+    #     if self.__cam is None:
+    #         return None
+
+    #     if time.time() - self.__fps_display_time >= 1.0:
+    #         self.__fps = self.__frame_count
+    #         self.__frame_count = 0
+    #         self.__fps_display_time = time.time()
+    #     self.__frame_count += 1
+
+    #     target_duration = 1 / self.__settings.framerate
+    #     while True:
+    #         elapsed = time.time() - self.__start
+    #         if elapsed >= target_duration:
+    #             break
+    #         if self.__stop_get_frame_event.wait(0.001):
+    #             return None
+    #     self.__start = time.time()
+
+    #     while self.__cam:
+    #         ret, image = self.__cam.retrieve()
+    #         if ret:
+    #             return image
+    #         if self.__stop_get_frame_event.wait(0.01):
+    #             return None
+    #     return None
+
     def read(self) -> cv2.Mat:
         if self.__cam is None:
             return None
 
-        if time.time() - self.__fps_display_time >= 1.0:
+        now = time.perf_counter()
+        if now - self.__fps_display_time >= 1.0:
             self.__fps = self.__frame_count
             self.__frame_count = 0
-            self.__fps_display_time = time.time()
+            self.__fps_display_time = now
         self.__frame_count += 1
 
-        target_duration = 1 / self.__settings.framerate
-        while True:
-            elapsed = time.time() - self.__start
-            if elapsed >= target_duration:
-                break
-            if self.__stop_get_frame_event.wait(0.001):
+        next_frame_time = self.__start + (1 / self.__settings.framerate)
+        now = time.perf_counter()
+        while now < next_frame_time:
+            wait_time = next_frame_time - now
+            if self.__stop_get_frame_event.wait(min(wait_time, 0.001)):
                 return None
-        self.__start = time.time()
+            now = time.perf_counter()
+        self.__start = next_frame_time 
 
         while self.__cam:
             ret, image = self.__cam.retrieve()
             if ret:
                 return image
-            if self.__stop_get_frame_event.wait(0.01):
+            if self.__stop_get_frame_event.wait(0.001):
                 return None
         return None
+
 
     def wait_open_cam(self):
         while not self.__is_cam_opened:

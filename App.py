@@ -1,21 +1,22 @@
 #!/usr/bin/python3
+
+import cv2
 import tkinter as tk
-import tkinter.ttk as ttk
-import Appui as baseui
+from Appui import AppUI
 from LibImTk import ImshowCustom, CameraGUI, CameraSettings
 
 
-class App(baseui.AppUI):
-    def __init__(self, master=None):
+class App(AppUI):
 
-        # ***************************************
-        # init function
-        # ***************************************
+    # ***************************************
+    # init function
+    # ***************************************
+    def __init__(self, master:tk.Tk=None):
         super().__init__(master)
         self.__draw_flag:bool=True
         self.__cv2c:ImshowCustom = None
         self.__cam:CameraGUI = None
-        self.__image_size=(0,0)
+        self.__image_size:tuple=(0,0)
 
         self.__init_gui()
         self.__init_cam()
@@ -34,21 +35,21 @@ class App(baseui.AppUI):
         
     def __init_cam(self):
         settings = CameraSettings()
-        settings.device_number = 1
+        settings.device_number = 0
         # settings.resolution = (3840, 2160)
         settings.resolution = (1920, 1080)
         settings.framerate = 10
-        self.__cam = CameraGUI(settings,self.frame_menu)
+        self.__cam = CameraGUI(settings,self.frame_cam_settings)
         
         
     # ***************************************
     # events function
     # ***************************************
-    def __on_mouse_action(self, event, x, y):
+    def __on_mouse_action(self, event: str, x: int, y: int):
         # print(event, x, y)
         pass
 
-    def __on_keyboard_action(self, event):
+    def __on_keyboard_action(self, event: str):
         # print(event)
         pass        
 
@@ -59,7 +60,7 @@ class App(baseui.AppUI):
     def __on_open_cam(self):
         self.__cam.start_get_frame()
 
-    def __on_read_frame(self, img):
+    def __on_read_frame(self, img: cv2.Mat):
         if self.__draw_flag:
             self.__cv2c.imshow(f'FPS:{self.__cam.fps}', img)
             if img.shape[:2] != self.__image_size:
@@ -67,12 +68,11 @@ class App(baseui.AppUI):
                 self.__cv2c.reset_view()
 
     # ***************************************
-    # public function
-    # ***************************************
-
-
-    # ***************************************
     # private function
+    # ***************************************
+
+    # ***************************************
+    # public function
     # ***************************************
 
 

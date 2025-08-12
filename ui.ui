@@ -46,7 +46,7 @@
         <child>
           <object class="tk.PanedWindow.Pane" id="pane1">
             <child>
-              <object class="tk.LabelFrame" id="frame_menu" named="True">
+              <object class="tk.LabelFrame" id="labelframe1">
                 <property name="font">TkDefaultFont</property>
                 <property name="height">200</property>
                 <property name="text" translatable="yes">menu</property>
@@ -59,6 +59,144 @@
                   <property name="pady">4</property>
                   <property name="side">left</property>
                 </layout>
+                <child>
+                  <object class="ttk.Notebook" id="notebook1">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="ipadx">4</property>
+                      <property name="ipady">4</property>
+                      <property name="padx">4</property>
+                      <property name="pady">4</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Notebook.Tab" id="tab1">
+                        <property name="text" translatable="yes"> main </property>
+                        <child>
+                          <object class="tk.Frame" id="frame1">
+                            <property name="height">200</property>
+                            <property name="relief">raised</property>
+                            <property name="width">200</property>
+                            <layout manager="pack">
+                              <property name="side">top</property>
+                            </layout>
+                            <child>
+                              <object class="tk.LabelFrame" id="labelframe2">
+                                <property name="height">200</property>
+                                <property name="text" translatable="yes">camera</property>
+                                <property name="width">200</property>
+                                <layout manager="pack">
+                                  <property name="fill">x</property>
+                                  <property name="ipadx">4</property>
+                                  <property name="ipady">4</property>
+                                  <property name="padx">4</property>
+                                  <property name="pady">4</property>
+                                  <property name="side">top</property>
+                                </layout>
+                                <child>
+                                  <object class="tk.Button" id="btn_save_image" named="True">
+                                    <property name="text" translatable="yes">save image</property>
+                                    <layout manager="pack">
+                                      <property name="fill">x</property>
+                                      <property name="ipadx">4</property>
+                                      <property name="ipady">4</property>
+                                      <property name="padx">4</property>
+                                      <property name="pady">4</property>
+                                      <property name="side">top</property>
+                                    </layout>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="tk.LabelFrame" id="frame_cross_line" named="True">
+                                    <property name="height">200</property>
+                                    <property name="text" translatable="yes">cross line</property>
+                                    <property name="width">200</property>
+                                    <layout manager="pack">
+                                      <property name="fill">x</property>
+                                      <property name="ipadx">4</property>
+                                      <property name="ipady">4</property>
+                                      <property name="padx">4</property>
+                                      <property name="pady">4</property>
+                                      <property name="side">top</property>
+                                    </layout>
+                                    <child>
+                                      <object class="tk.Checkbutton" id="chk_closs_line" named="True">
+                                        <property name="text" translatable="yes">enable</property>
+                                        <layout manager="pack">
+                                          <property name="anchor">w</property>
+                                          <property name="side">top</property>
+                                        </layout>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="tk.LabelFrame" id="labelframe4">
+                                <property name="height">200</property>
+                                <property name="text" translatable="yes">camera settings file</property>
+                                <property name="width">200</property>
+                                <layout manager="pack">
+                                  <property name="fill">x</property>
+                                  <property name="ipadx">4</property>
+                                  <property name="ipady">4</property>
+                                  <property name="padx">4</property>
+                                  <property name="pady">4</property>
+                                  <property name="side">top</property>
+                                </layout>
+                                <child>
+                                  <object class="tk.Button" id="btn_load_settings" named="True">
+                                    <property name="text" translatable="yes">load file</property>
+                                    <layout manager="pack">
+                                      <property name="fill">x</property>
+                                      <property name="ipadx">4</property>
+                                      <property name="ipady">4</property>
+                                      <property name="padx">4</property>
+                                      <property name="pady">4</property>
+                                      <property name="side">top</property>
+                                    </layout>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="tk.Button" id="btn_save_settings" named="True">
+                                    <property name="text" translatable="yes">save file</property>
+                                    <layout manager="pack">
+                                      <property name="fill">x</property>
+                                      <property name="ipadx">4</property>
+                                      <property name="ipady">4</property>
+                                      <property name="padx">4</property>
+                                      <property name="pady">4</property>
+                                      <property name="side">top</property>
+                                    </layout>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Notebook.Tab" id="tab2">
+                        <property name="text" translatable="yes">camera settigs</property>
+                        <child>
+                          <object class="tk.Frame" id="frame_cam_settings" named="True">
+                            <property name="height">200</property>
+                            <property name="relief">raised</property>
+                            <property name="width">200</property>
+                            <layout manager="pack">
+                              <property name="side">top</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
