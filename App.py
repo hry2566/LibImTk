@@ -3,7 +3,7 @@
 import cv2
 import tkinter as tk
 from Appui import AppUI
-from LibImTk import ImshowCustom, CameraGUI, CameraSettings
+from LibImTk import ImshowCustom, CameraGUI, CameraSettings, CrossLine
 
 
 class App(AppUI):
@@ -15,6 +15,7 @@ class App(AppUI):
         super().__init__(master)
         self.__draw_flag:bool=True
         self.__cv2c:ImshowCustom = None
+        self.__cross_line:CrossLine = None
         self.__cam:CameraGUI = None
         self.__image_size:tuple=(0,0)
 
@@ -24,7 +25,8 @@ class App(AppUI):
         
     def __init_gui(self):
         self.__cv2c=ImshowCustom(self.frame_view, self.mainwindow)
-        self.pane_main.sash_place(0,280,0)
+        self.pane_main.sash_place(0,300,0)
+        self.__cross_line = CrossLine(self.frame_main)
 
     def __init_events(self):
         self.mainwindow.protocol("WM_DELETE_WINDOW", self.__on_close_window)
@@ -62,6 +64,7 @@ class App(AppUI):
 
     def __on_read_frame(self, img: cv2.Mat):
         if self.__draw_flag:
+            self.__cross_line.get_cross_line_image(img)
             self.__cv2c.imshow(f'FPS:{self.__cam.fps}', img)
             if img.shape[:2] != self.__image_size:
                 self.__image_size = img.shape[:2]

@@ -26,28 +26,13 @@ class AppUI:
             width=300)
         notebook1 = ttk.Notebook(labelframe1)
         notebook1.configure(height=200, width=200)
-        frame1 = tk.Frame(notebook1)
-        frame1.configure(height=200, relief="raised", width=200)
-        labelframe2 = tk.LabelFrame(frame1)
+        self.frame_main = tk.Frame(notebook1, name="frame_main")
+        self.frame_main.configure(height=200, relief="raised", width=200)
+        labelframe2 = tk.LabelFrame(self.frame_main)
         labelframe2.configure(height=200, text='camera', width=200)
         self.btn_save_image = tk.Button(labelframe2, name="btn_save_image")
         self.btn_save_image.configure(text='save image')
         self.btn_save_image.pack(
-            fill="x",
-            ipadx=4,
-            ipady=4,
-            padx=4,
-            pady=4,
-            side="top")
-        self.frame_cross_line = tk.LabelFrame(
-            labelframe2, name="frame_cross_line")
-        self.frame_cross_line.configure(
-            height=200, text='cross line', width=200)
-        self.chk_closs_line = tk.Checkbutton(
-            self.frame_cross_line, name="chk_closs_line")
-        self.chk_closs_line.configure(text='enable')
-        self.chk_closs_line.pack(anchor="w", side="top")
-        self.frame_cross_line.pack(
             fill="x",
             ipadx=4,
             ipady=4,
@@ -61,7 +46,7 @@ class AppUI:
             padx=4,
             pady=4,
             side="top")
-        labelframe4 = tk.LabelFrame(frame1)
+        labelframe4 = tk.LabelFrame(self.frame_main)
         labelframe4.configure(
             height=200,
             text='camera settings file',
@@ -93,7 +78,7 @@ class AppUI:
             padx=4,
             pady=4,
             side="top")
-        notebook1.add(frame1, text=' main ')
+        notebook1.add(self.frame_main, text=' main ')
         self.frame_cam_settings = tk.Frame(
             notebook1, name="frame_cam_settings")
         self.frame_cam_settings.configure(

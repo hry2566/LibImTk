@@ -84,6 +84,17 @@ class ScaleEx():
 
     def __handler(self, func, *args):
         return func(*args)
+    
+    def __getitem__(self, key):
+        if key=='default':
+            return self.__default
+        return self.__scale[key]
+
+    def __setitem__(self, key, value):
+        if key=='default':
+            self.__default = value
+            return
+        self.__scale[key] = value
 
     def set(self, val: int,event_flag=True):
         self.__val.set(val)
@@ -93,6 +104,9 @@ class ScaleEx():
             self.__callback()
 
     def configure(self, padx:int=None, pady:int=None, label:str=None, side:str=None, from_:int=None, to:int=None, default:int=None, resolution:float=None):
+        self.__lblframe.configure(text=label)
+        self.__lblframe.pack(side=side, padx=padx, pady=pady)
+        self.__scale.configure(from_=from_, to=to, resolution=resolution)
         self.__lblframe.configure(text=label)
         self.__lblframe.pack(side=side, padx=padx, pady=pady)
         self.__scale.configure(from_=from_, to=to, resolution=resolution)
